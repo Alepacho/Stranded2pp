@@ -4,6 +4,8 @@ Reimplementing a very cool game just for fun :)
 
 Go get original game [here](http://www.unrealsoftware.de/game_stranded2.php)!
 
+Check [COMPILING.md](./COMPILING.md) to make an executable file.
+
 # Copyright/License information
 
 Original game by Peter Schauß.

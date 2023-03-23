@@ -5,6 +5,7 @@ ASAP!
 
 * Decide about Modification class and some resource manager
 * Rewrite all the trash (more details, pls?)
+* Fix High DPI mode on macOS
 * [Done] Screen system should be moved out of Gui to Stranded
 * [Done] Move to CMake build system
 
