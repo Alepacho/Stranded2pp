@@ -21,6 +21,6 @@ private:
 	bool init(bool forceWindowedMode, Modification const & modification);
 private:
 	sf::Window window;
-
+	double scaleFactor;
 	Input* input;
 };

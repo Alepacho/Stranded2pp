@@ -10,8 +10,13 @@
 
 Window::Window(bool forceWindowedMode, Modification const & modification) :
 	window(),
+	scaleFactor(1),
 	input(nullptr)
 {
+	#ifdef __APPLE__
+	scaleFactor = 0.5;
+	#endif
+
 	if (!init(forceWindowedMode, modification)) {
 		throw std::runtime_error("Unable to initialize Window");
 	}
@@ -28,21 +33,35 @@ bool Window::init(bool forceWindowedMode, const Modification& modification)
 	contextSettings.antialiasingLevel = 0;
 	contextSettings.majorVersion = 2;
 	contextSettings.minorVersion = 1;
-
+	
 	// Video mode
 	sf::VideoMode videoMode;
-	videoMode.width = gameSettings.screen.width;
+	videoMode.width  = gameSettings.screen.width;
 	videoMode.height = gameSettings.screen.height;
 	videoMode.bitsPerPixel = gameSettings.screen.bitsPerPixel;
+	std::cout << "Video Mode  :\n";
+	std::cout << "Width       : " << videoMode.width << std::endl;
+	std::cout << "Height      : " << videoMode.height << std::endl;
+	std::cout << "BPP         : " << videoMode.bitsPerPixel << std::endl;
+	std::cout << "Windowed    : " << (forceWindowedMode ? "true" : "false") << std::endl;
+	std::cout << "Scale Factor: " << scaleFactor << std::endl << std::endl;
 
 	// Check fullscreen video mode
 	if (!forceWindowedMode && !videoMode.isValid())
 	{
-		std::cout << "Error: invalid video mode! Selecting default" << std::endl;
+		std::cout << "Error: No 'Force Windowed Mode' selected or video mode is invalid! Selecting default" << std::endl;
 
 		auto modes = sf::VideoMode::getFullscreenModes();
 		videoMode = modes[0]; // Best available
+
+		// videoMode.width  *= scaleFactor;
+		// videoMode.height *= scaleFactor;
+
 		std::cout << "New video mode: " << videoMode.width << "x" << videoMode.height << std::endl;
+	} else {
+		// fix size on High DPI displays
+		videoMode.width  /= scaleFactor;
+		videoMode.height /= scaleFactor;
 	}
 
 	std::string title = "S2++ '";
@@ -103,15 +122,21 @@ void Window::pollEvents()
 		case sf::Event::MouseButtonPressed:
 			input->onRawEventMouseButtonPressed(
 				mouse::sfmlToBlitz(event.mouseButton.button),
-				event.mouseButton.x, event.mouseButton.y);
+				event.mouseButton.x * scaleFactor,
+				event.mouseButton.y * scaleFactor);
 			break;
 		case sf::Event::MouseButtonReleased:
 			input->onRawEventMouseButtonReleased(
 				mouse::sfmlToBlitz(event.mouseButton.button),
-				event.mouseButton.x, event.mouseButton.y);
+				event.mouseButton.x * scaleFactor,
+				event.mouseButton.y * scaleFactor
+			);
 			break;
 		case sf::Event::MouseMoved:
-			input->onRawEventMouseMoved(event.mouseMove.x, event.mouseMove.y); break;
+			input->onRawEventMouseMoved(
+				event.mouseMove.x * scaleFactor, 
+				event.mouseMove.y * scaleFactor
+			); break;
 		case sf::Event::MouseEntered:
 		case sf::Event::MouseLeft:
 		case sf::Event::JoystickButtonPressed:
